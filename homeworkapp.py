@@ -33,7 +33,7 @@ st.write(
 try:
     client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 except KeyError:
-    st.error("Please set your OPENAI_API_KEY in .streamlit/secrets.toml.")
+    st.error("Please set your OPENAI_API_KEY in .streamlit/secrets.toml on Streamlit Cloud.")
     st.stop()
 
 # -------------------------------
@@ -89,17 +89,24 @@ if image is not None:
             for idx, question in enumerate(questions, start=1):
                 st.markdown(f"**Q{idx}. {question}**")
 
-                # Get short answer
+                # Get short answer in English
                 with st.spinner("Thinking..."):
                     try:
-                        short_prompt = f"Answer this question for a child in grades 3-5 in a single sentence, no extra explanation: {question}"
+                        short_prompt = (
+                            f"Answer this question for a child in grades 3-5 "
+                            f"in a single sentence in English, no extra explanation: {question}"
+                        )
 
                         completion = client.chat.completions.create(
                             model="gpt-3.5-turbo",
                             messages=[
                                 {
                                     "role": "system",
-                                    "content": "You are a helpful homework assistant for children aged 8-11. Provide short, factual answers suitable for a child in grades 3-5. Do not elaborate unless asked."
+                                    "content": (
+                                        "You are a helpful homework assistant for children aged 8-11. "
+                                        "Provide short, factual answers suitable for a child in grades 3-5. "
+                                        "Do not elaborate unless asked."
+                                    )
                                 },
                                 {
                                     "role": "user",
@@ -117,20 +124,27 @@ if image is not None:
 
                 st.write(f"✅ **Answer:** {short_answer}")
 
-                # Button to get a longer explanation
-                expander = st.expander("🔎 Explain More")
+                # Button to get a longer explanation in Tamil
+                expander = st.expander("🔎 Explain More (in Tamil)")
                 with expander:
                     if st.button(f"Get Explanation for Q{idx}", key=f"explain_{idx}"):
-                        with st.spinner("Generating detailed explanation..."):
+                        with st.spinner("Generating detailed explanation in Tamil..."):
                             try:
-                                long_prompt = f"Explain this in detail for a child in grades 3-5: {question}"
+                                long_prompt = (
+                                    f"Explain this question and its answer in detail "
+                                    f"for a child in grades 3-5, using simple Tamil language: {question}"
+                                )
 
                                 long_completion = client.chat.completions.create(
                                     model="gpt-3.5-turbo",
                                     messages=[
                                         {
                                             "role": "system",
-                                            "content": "You are a helpful homework assistant for children aged 8-11. Provide detailed but simple explanations suitable for a child in grades 3-5."
+                                            "content": (
+                                                "You are a helpful homework assistant for children aged 8-11. "
+                                                "Provide detailed explanations in very simple Tamil, suitable for "
+                                                "a child in grades 3-5."
+                                            )
                                         },
                                         {
                                             "role": "user",
@@ -146,7 +160,7 @@ if image is not None:
                             except Exception as e:
                                 long_answer = f"Sorry, I couldn't fetch an explanation. Error: {e}"
 
-                        st.write(f"📖 **Explanation:** {long_answer}")
+                        st.write(f"📖 **Explanation (Tamil):** {long_answer}")
 
         else:
             st.info("No specific questions detected in the extracted text.")
